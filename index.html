@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>小月亮 · 经期记录</title>
+<meta name="description" content="离线运行的经期记录与周期预测，数据只存在你自己的设备上。">
+<meta name="theme-color" content="#FFF3F8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#241A26" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="小月亮">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- 背景里飘着的小装饰 -->
+  <span class="deco deco-1" aria-hidden="true">
+    <svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 2.5 14.2 9.3 21 11.5 14.2 13.7 12 20.5 9.8 13.7 3 11.5 9.8 9.3Z" fill="#FFD75E"/></svg>
+  </span>
+  <span class="deco deco-2" aria-hidden="true">
+    <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 21s-7-4.4-7-9.3A4.3 4.3 0 0 1 12 8.6a4.3 4.3 0 0 1 7 3.1C19 16.6 12 21 12 21Z" fill="#FF9CBC"/></svg>
+  </span>
+  <span class="deco deco-3" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 2.5 14.2 9.3 21 11.5 14.2 13.7 12 20.5 9.8 13.7 3 11.5 9.8 9.3Z" fill="#9BD1F2"/></svg>
+  </span>
+
+  <!-- ───────────────── 首页 ───────────────── -->
+  <main class="view is-active" id="view-home">
+    <header class="topbar">
+      <div>
+        <p class="hello" id="greeting">你好呀</p>
+        <h1 class="hello-name" id="helloName">今天感觉怎么样</h1>
+      </div>
+      <button class="icon-btn" id="btnTheme" title="换配色" aria-label="换配色">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      </button>
+    </header>
+
+    <section class="card hero" id="heroCard">
+      <div class="hero-art">
+        <!-- 原创吉祥物「小月亮」：圆脸 + 头顶一枚小月牙，表情随周期变化 -->
+        <svg class="mascot" id="mascot" data-mood="normal" viewBox="0 0 120 120" aria-hidden="true">
+          <defs>
+            <linearGradient id="mBody" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#FFF8FB"/><stop offset="1" stop-color="#FFDCE9"/>
+            </linearGradient>
+            <linearGradient id="mMoon" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#FFE08A"/><stop offset="1" stop-color="#FFB33D"/>
+            </linearGradient>
+            <mask id="mCres">
+              <rect width="120" height="120" fill="#000"/>
+              <circle cx="58" cy="25" r="20" fill="#fff"/>
+              <circle cx="70" cy="18" r="17" fill="#000"/>
+            </mask>
+          </defs>
+
+          <!-- 头顶的小月牙 -->
+          <rect width="120" height="120" fill="url(#mMoon)" mask="url(#mCres)"/>
+
+          <!-- 身体 -->
+          <ellipse cx="60" cy="70" rx="37" ry="33" fill="url(#mBody)" stroke="#FFB8D0" stroke-width="2.6"/>
+          <!-- 腮红 -->
+          <ellipse cx="40" cy="78" rx="8" ry="5.4" fill="#FF9CBC" opacity=".5"/>
+          <ellipse cx="80" cy="78" rx="8" ry="5.4" fill="#FF9CBC" opacity=".5"/>
+
+          <!-- 平常：圆眼睛 + 微笑 -->
+          <g class="g g-normal">
+            <circle cx="47" cy="68" r="4.6" fill="#5C4653"/>
+            <circle cx="73" cy="68" r="4.6" fill="#5C4653"/>
+            <path d="M54 80q6 6 12 0" fill="none" stroke="#5C4653" stroke-width="2.6" stroke-linecap="round"/>
+          </g>
+
+          <!-- 经期：闭眼安慰脸，抱着小爱心 -->
+          <g class="g g-menstrual">
+            <path d="M41 70q6-7 12 0" fill="none" stroke="#5C4653" stroke-width="2.6" stroke-linecap="round"/>
+            <path d="M67 70q6-7 12 0" fill="none" stroke="#5C4653" stroke-width="2.6" stroke-linecap="round"/>
+            <path d="M56 80q4 4 8 0" fill="none" stroke="#5C4653" stroke-width="2.6" stroke-linecap="round"/>
+            <path d="M92 48s-8-5-8-10.4A4.6 4.6 0 0 1 92 34.6a4.6 4.6 0 0 1 8 3c0 5.4-8 10.4-8 10.4Z"
+                  fill="#FF6F91"/>
+          </g>
+
+          <!-- 卵泡期：圆眼睛 + 大笑 -->
+          <g class="g g-follicular">
+            <circle cx="47" cy="68" r="4.6" fill="#5C4653"/>
+            <circle cx="73" cy="68" r="4.6" fill="#5C4653"/>
+            <path d="M52 78q8 9 16 0" fill="none" stroke="#5C4653" stroke-width="2.8" stroke-linecap="round"/>
+          </g>
+
+          <!-- 排卵期：星星眼 -->
+          <g class="g g-ovulation">
+            <path d="M47 61l1.6 4.6 4.6 1.6-4.6 1.6L47 73.4l-1.6-4.6L40.8 67.2l4.6-1.6Z" fill="#FFB93D"/>
+            <path d="M73 61l1.6 4.6 4.6 1.6-4.6 1.6L73 73.4l-1.6-4.6-4.6-1.6 4.6-1.6Z" fill="#FFB93D"/>
+            <path d="M54 81q6 6 12 0" fill="none" stroke="#5C4653" stroke-width="2.6" stroke-linecap="round"/>
+            <path class="sparkle" d="M22 34l1.4 4 4 1.4-4 1.4L22 44.8l-1.4-4-4-1.4 4-1.4Z" fill="#FFD75E"/>
+            <path class="sparkle sparkle-2" d="M98 62l1.2 3.4 3.4 1.2-3.4 1.2-1.2 3.4-1.2-3.4-3.4-1.2 3.4-1.2Z" fill="#FFD75E"/>
+          </g>
+
+          <!-- 黄体期：困困的，打小呼噜 -->
+          <g class="g g-luteal">
+            <path d="M41 70q6 6 12 0" fill="none" stroke="#5C4653" stroke-width="2.6" stroke-linecap="round"/>
+            <path d="M67 70q6 6 12 0" fill="none" stroke="#5C4653" stroke-width="2.6" stroke-linecap="round"/>
+            <path d="M56 82h8" fill="none" stroke="#5C4653" stroke-width="2.6" stroke-linecap="round"/>
+            <g class="zzz" transform="translate(94 34)" fill="none" stroke="#A98CFF" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round">
+              <path d="M0 0h7l-7 7h7"/>
+              <path d="M9-9h5l-5 5h5" transform="scale(.8)"/>
+            </g>
+          </g>
+
+          <!-- 已推迟：圆眼睛 + 小问号 -->
+          <g class="g g-overdue">
+            <circle cx="47" cy="68" r="4.6" fill="#5C4653"/>
+            <circle cx="73" cy="68" r="4.6" fill="#5C4653"/>
+            <path d="M56 82h8" fill="none" stroke="#5C4653" stroke-width="2.6" stroke-linecap="round"/>
+            <path d="M96 34a6 6 0 1 1 6 6v3" fill="none" stroke="#F0605E" stroke-width="2.4" stroke-linecap="round"/>
+            <circle cx="102" cy="49" r="1.7" fill="#F0605E"/>
+          </g>
+        </svg>
+
+        <!-- 进度环：绕着小月亮一圈 -->
+        <div class="hero-ring">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="ring-bg" cx="60" cy="60" r="52"/>
+            <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="52"/>
+          </svg>
+        </div>
+
+        <!-- 她自己上传的贴纸 -->
+        <img class="sticker" id="sticker" alt="" hidden>
+      </div>
+
+      <div class="hero-info">
+        <span class="pill" id="phasePill">正在计算</span>
+        <p class="hero-big"><span class="hero-num" id="heroNum">–</span><span class="hero-unit" id="heroUnit">天</span></p>
+        <p class="hero-line" id="heroLine">先记一次经期</p>
+        <p class="hero-sub" id="heroSub"></p>
+        <div class="hero-dates">
+          <div><span class="k">上次经期</span><b id="lastStart">—</b></div>
+          <div><span class="k">预计下次</span><b id="nextDue">—</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="quick" id="quickActions">
+      <button class="btn btn-primary" id="btnPeriodStart">经期来了</button>
+      <button class="btn btn-soft" id="btnPeriodToday">今天还在经期</button>
+      <button class="btn btn-soft" id="btnPeriodEnd">经期结束了</button>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>今天的记录</h2>
+        <span class="muted" id="todayLabel"></span>
+      </div>
+
+      <p class="label">流量</p>
+      <div class="chips chips-flow" id="flowChips"></div>
+
+      <p class="label">身体感受</p>
+      <div class="chips" id="symptomChips"></div>
+
+      <p class="label">心情</p>
+      <div class="chips" id="moodChips"></div>
+
+      <p class="label">想写点什么</p>
+      <textarea id="noteInput" rows="2" placeholder="肚子有点闷、今天很困……"></textarea>
+    </section>
+
+    <section class="card tip" id="tipCard">
+      <div class="card-head"><h2>小提示</h2></div>
+      <p id="tipText">记录得越多，预测越准。</p>
+    </section>
+
+    <p class="disclaimer">预测基于你自己的历史记录估算，仅供参考，不能作为医疗建议或避孕依据。</p>
+  </main>
+
+  <!-- ───────────────── 日历 ───────────────── -->
+  <main class="view" id="view-calendar">
+    <header class="topbar">
+      <div>
+        <p class="hello">日历</p>
+        <h1 class="hello-name" id="calTitle">—</h1>
+      </div>
+      <div class="cal-nav">
+        <button class="icon-btn" id="calPrev" aria-label="上个月">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>
+        </button>
+        <button class="icon-btn" id="calNext" aria-label="下个月">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="cal-week" id="calWeek"></div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="legend">
+        <span><i class="dot d-menstrual"></i>经期</span>
+        <span><i class="dot d-predicted"></i>预计经期</span>
+        <span><i class="dot d-fertile"></i>易孕</span>
+        <span><i class="dot d-ovulation"></i>排卵</span>
+        <span><i class="dot d-logged"></i>有记录</span>
+      </div>
+      <p class="hint">点任意一天就能补记当天的情况。把流量改回「无」，这天就不算经期了。</p>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>周期历史</h2></div>
+      <div id="periodList" class="history"></div>
+    </section>
+  </main>
+
+  <!-- ───────────────── 统计 ───────────────── -->
+  <main class="view" id="view-stats">
+    <header class="topbar">
+      <div>
+        <p class="hello">统计</p>
+        <h1 class="hello-name">你的身体节律</h1>
+      </div>
+    </header>
+
+    <section class="stat-row" id="statRow"></section>
+
+    <section class="card">
+      <div class="card-head"><h2>最近几个周期</h2></div>
+      <div class="bars" id="cycleBars"></div>
+      <p class="hint" id="regularityHint"></p>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>各阶段都在什么时候</h2></div>
+      <div class="phase-legend" id="phaseLegend"></div>
+    </section>
+  </main>
+
+  <!-- ───────────────── 设置 ───────────────── -->
+  <main class="view" id="view-settings">
+    <header class="topbar">
+      <div>
+        <p class="hello">设置</p>
+        <h1 class="hello-name">按她的情况调</h1>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="card-head"><h2>称谓</h2></div>
+      <input type="text" id="nameInput" placeholder="想怎么称呼你" maxlength="12">
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>周期参数</h2></div>
+      <label class="row">
+        <span>自动学习周期长度<b class="muted-sm" id="autoCycleHint"></b></span>
+        <input type="checkbox" id="autoCycle" class="switch">
+      </label>
+      <div class="row" id="cycleRow">
+        <span>周期长度</span>
+        <span class="stepper">
+          <button class="step" data-step="cycleLen" data-dir="-1">−</button>
+          <b id="cycleLenVal">28 天</b>
+          <button class="step" data-step="cycleLen" data-dir="1">+</button>
+        </span>
+      </div>
+      <div class="row">
+        <span>经期长度</span>
+        <span class="stepper">
+          <button class="step" data-step="periodLen" data-dir="-1">−</button>
+          <b id="periodLenVal">5 天</b>
+          <button class="step" data-step="periodLen" data-dir="1">+</button>
+        </span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>贴纸</h2></div>
+      <p class="hint">挑一张喜欢的图传上来，它会贴到首页那个小月亮旁边。图片只存在这台设备上，不会上传到任何地方。换手机或者清空记录之后要重新选一次。</p>
+      <div class="sticker-row">
+        <img id="stickerPreview" class="sticker-preview" alt="贴纸预览" hidden>
+        <div class="sticker-btns">
+          <button class="btn btn-soft" id="btnStickerPick">选一张图</button>
+          <button class="btn btn-danger-ghost" id="btnStickerClear">去掉贴纸</button>
+        </div>
+      </div>
+      <input type="file" id="stickerFile" accept="image/*" hidden>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>提醒</h2></div>
+      <label class="row">
+        <span>经期前几天提醒我<b class="muted-sm" id="notifyHint"></b></span>
+        <input type="checkbox" id="notifyOn" class="switch">
+      </label>
+      <div class="row">
+        <span>提前天数</span>
+        <span class="stepper">
+          <button class="step" data-step="leadDays" data-dir="-1">−</button>
+          <b id="leadDaysVal">2 天</b>
+          <button class="step" data-step="leadDays" data-dir="1">+</button>
+        </span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>配色</h2></div>
+      <div class="chips" id="themeChips"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>数据</h2></div>
+      <p class="hint">所有记录只保存在这台设备上，不会上传到任何服务器。换手机或想留个备份，用下面两个按钮。</p>
+      <p class="hint" id="backupHint"></p>
+      <div class="btn-col">
+        <button class="btn btn-soft" id="btnExport">导出备份（JSON）</button>
+        <button class="btn btn-soft" id="btnExportCsv">导出表格（CSV）</button>
+        <button class="btn btn-soft" id="btnImport">导入备份</button>
+        <input type="file" id="importFile" accept="application/json,.json" hidden>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>关于</h2></div>
+      <p class="hint" id="aboutText"></p>
+      <div class="btn-col">
+        <button class="btn btn-danger" id="btnWipe">清空全部记录</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ───────────────── 底部导航 ───────────────── -->
+  <nav class="tabbar">
+    <button class="tab is-active" data-view="home">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/></svg>
+      <span>今天</span>
+    </button>
+    <button class="tab" data-view="calendar">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v3M17 2v3M3 9h18M5 5h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/></svg>
+      <span>日历</span>
+    </button>
+    <button class="tab" data-view="stats">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+      <span>统计</span>
+    </button>
+    <button class="tab" data-view="settings">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2 2 2 0 1 1-4 0 1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 15a2 2 0 1 1 0-4 1.7 1.7 0 0 0 1.4-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 4a2 2 0 1 1 4 0 1.7 1.7 0 0 0 2.8 1.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 21 11a2 2 0 1 1 0 4Z"/></svg>
+      <span>设置</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- ───────────────── 某一天的弹层 ───────────────── -->
+<div class="sheet-mask" id="sheetMask" hidden>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true">
+    <div class="sheet-grab"></div>
+    <div class="card-head">
+      <h2 id="sheetTitle">—</h2>
+      <button class="icon-btn" id="sheetClose" aria-label="关闭">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <p class="label">流量</p>
+    <div class="chips chips-flow" id="sheetFlow"></div>
+    <p class="label">身体感受</p>
+    <div class="chips" id="sheetSymptoms"></div>
+    <p class="label">心情</p>
+    <div class="chips" id="sheetMoods"></div>
+    <p class="label">备注</p>
+    <textarea id="sheetNote" rows="2" placeholder="记点什么"></textarea>
+    <div class="btn-col">
+      <button class="btn btn-primary" id="sheetSave">保存</button>
+      <button class="btn btn-danger-ghost" id="sheetClear">清除这一天的记录</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+<div class="burst" id="burst" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,458 @@
+/*  小月亮 · 样式
+    风格：奶油粉 + 贴纸感。圆润厚边的卡片、按下去会回弹的按钮、
+    到处都是小星星。配色分浅色/深色两套，都保持"软"的质感。 */
+
+:root{
+  --bg:            #FFF3F8;
+  --bg-dot:        rgba(255,127,168,.13);
+  --bg-dot2:       rgba(155,209,242,.14);
+  --surface:       #FFFFFF;
+  --surface-soft:  #FFF1F7;
+  --line:          #FFD7E6;
+  --line-strong:   #FFC2DA;
+  --ink:           #5C4653;
+  --ink2:          #8E7684;
+  --ink3:          #BCA5B3;
+  --pink:          #FF7FA8;
+  --pink-deep:     #EF5F8C;
+  --pink-line:     #FFA9C4;
+  --pink-soft:     #FFDCE9;
+  --pink-ink:      #FFFFFF;
+  --yellow:        #FFD75E;
+  --danger:        #F0605E;
+
+  /* 周期各阶段 */
+  --menstrual:     #FF6F91;
+  --follicular:    #7FC4F0;
+  --ovulation:     #FFB93D;
+  --luteal:        #A98CFF;
+  --fertile:       #57CE9B;
+  --predicted:     #FFC6DA;
+
+  --shadow:        0 4px 0 var(--line), 0 12px 26px rgba(255,127,168,.15);
+  --shadow-sm:     0 3px 0 var(--line);
+  --radius:        26px;
+  --radius-sm:     18px;
+  --safe-b:        env(safe-area-inset-bottom, 0px);
+  --safe-t:        env(safe-area-inset-top, 0px);
+}
+
+html[data-theme="dark"]{
+  --bg:            #241A26;
+  --bg-dot:        rgba(255,143,180,.09);
+  --bg-dot2:       rgba(143,205,245,.09);
+  --surface:       #33263A;
+  --surface-soft:  #3D2E45;
+  --line:          #523B5E;
+  --line-strong:   #6A4A78;
+  --ink:           #FBEDF4;
+  --ink2:          #C9B2C1;
+  --ink3:          #9C8496;
+  --pink:          #FF8FB4;
+  --pink-deep:     #F2739D;
+  --pink-line:     #B4658A;
+  --pink-soft:     #4B2F3F;
+  --pink-ink:      #2A1220;
+  --yellow:        #FFD75E;
+  --danger:        #FF8B85;
+
+  --menstrual:     #FF7C9C;
+  --follicular:    #8FCDF5;
+  --ovulation:     #FFC85C;
+  --luteal:        #B9A2FF;
+  --fertile:       #6FDDA8;
+  --predicted:     #7B4A61;
+
+  --shadow:        0 4px 0 rgba(0,0,0,.28), 0 12px 26px rgba(0,0,0,.34);
+  --shadow-sm:     0 3px 0 rgba(0,0,0,.28);
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+/* 带 hidden 的元素必须真的不显示：
+   .sheet-mask 之类设了 display:flex，会盖掉浏览器默认的 [hidden]{display:none}。 */
+[hidden]{display:none!important}
+
+html,body{margin:0;padding:0}
+
+body{
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(circle at 14px 14px, var(--bg-dot) 2.6px, transparent 3.4px),
+    radial-gradient(circle at 46px 46px, var(--bg-dot2) 2.2px, transparent 3px);
+  background-size:62px 62px;
+  color:var(--ink);
+  font:16px/1.6 ui-rounded, -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "PingFang SC",
+       "Hiragino Sans GB", "Yuanti SC", "Microsoft YaHei", "Noto Sans SC", "Segoe UI", sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior-y:none;
+}
+
+b{font-weight:700}
+.muted{color:var(--ink3);font-size:13px}
+.muted-sm{color:var(--ink3);font-weight:400;font-size:12.5px;margin-left:6px}
+.hint{color:var(--ink3);font-size:13px;line-height:1.65;margin:12px 2px 0}
+.disclaimer{color:var(--ink3);font-size:12px;line-height:1.65;margin:22px 8px 4px;text-align:center}
+.label{color:var(--ink2);font-size:13.5px;font-weight:700;margin:18px 2px 8px}
+
+/* ── 外壳与背景小装饰 ─────────────────────────── */
+.phone{
+  max-width:520px;
+  margin:0 auto;
+  min-height:100dvh;
+  background:var(--bg);
+  padding:calc(var(--safe-t) + 8px) 0 calc(96px + var(--safe-b));
+  position:relative;
+  overflow-x:hidden;
+}
+
+.deco{position:absolute;pointer-events:none;opacity:.85;z-index:0}
+.deco svg{display:block}
+.deco-1{top:26px;right:70px;animation:drift 5s ease-in-out infinite}
+.deco-2{top:98px;left:14px;animation:drift 6.5s ease-in-out infinite .8s}
+.deco-3{top:190px;right:16px;animation:drift 7s ease-in-out infinite 1.6s}
+@keyframes drift{
+  0%,100%{transform:translateY(0) rotate(0deg)}
+  50%{transform:translateY(-9px) rotate(10deg)}
+}
+
+.view{display:none;padding:0 18px;position:relative;z-index:1}
+.view.is-active{display:block;animation:pop .26s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.99)}to{opacity:1;transform:none}}
+
+.topbar{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:18px 2px 16px}
+.hello{margin:0;color:var(--ink3);font-size:13.5px;letter-spacing:.02em}
+.hello-name{margin:2px 0 0;font-size:22px;line-height:1.35;font-weight:750;letter-spacing:-.01em}
+
+/* ── 卡片：贴纸感 ─────────────────────────────── */
+.card{
+  background:var(--surface);
+  border:2.5px solid var(--line);
+  border-radius:var(--radius);
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:var(--shadow);
+}
+.card-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:4px}
+.card-head h2{margin:0;font-size:15.5px;font-weight:750;letter-spacing:.01em}
+.card-head h2::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;
+  background:var(--pink);margin-right:8px;vertical-align:1px}
+
+/* ── 吉祥物 ───────────────────────────────────── */
+.mascot{width:104px;height:104px;flex:0 0 104px;animation:bob 3.4s ease-in-out infinite}
+@keyframes bob{
+  0%,100%{transform:translateY(0) rotate(-2.5deg)}
+  50%{transform:translateY(-7px) rotate(2.5deg)}
+}
+/* 表情分组：默认都藏起来，由 data-mood 决定露出哪一组 */
+.mascot .g{display:none}
+.mascot[data-mood="normal"]     .g-normal,
+.mascot[data-mood="menstrual"]  .g-menstrual,
+.mascot[data-mood="follicular"] .g-follicular,
+.mascot[data-mood="ovulation"]  .g-ovulation,
+.mascot[data-mood="luteal"]     .g-luteal,
+.mascot[data-mood="overdue"]    .g-overdue{display:inline}
+.mascot .sparkle{animation:twinkle 1.8s ease-in-out infinite}
+.mascot .sparkle-2{animation-delay:.6s}
+@keyframes twinkle{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.12)}}
+.mascot .zzz{animation:zzz 2.4s ease-in-out infinite}
+@keyframes zzz{0%{opacity:0;transform:translate(0,4px)}40%{opacity:1}100%{opacity:0;transform:translate(6px,-10px)}}
+
+/* 她上传的自定义贴纸 */
+.sticker{position:absolute;right:-16px;bottom:-16px;width:50px;height:50px;object-fit:contain;
+  filter:drop-shadow(0 3px 6px rgba(120,60,90,.22));animation:wobble 4s ease-in-out infinite;z-index:2}
+@keyframes wobble{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+
+/* ── 首页主卡 ─────────────────────────────────── */
+.hero{display:flex;align-items:center;gap:14px;padding:20px 16px;position:relative;
+  background:linear-gradient(165deg, var(--surface) 55%, var(--pink-soft))}
+.hero-art{position:relative;flex:0 0 104px;width:104px}
+.hero-ring{position:absolute;inset:-8px;width:120px;height:120px;pointer-events:none}
+.hero-ring svg{width:120px;height:120px;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--surface-soft);stroke-width:8}
+.ring-fg{
+  fill:none;stroke:var(--menstrual);stroke-width:8;stroke-linecap:round;
+  stroke-dasharray:326.7;stroke-dashoffset:326.7;
+  transition:stroke-dashoffset .7s cubic-bezier(.34,1.4,.64,1), stroke .3s;
+}
+.hero-info{min-width:0;flex:1}
+.hero-big{margin:10px 0 0;line-height:1}
+.hero-num{font-size:34px;font-weight:800;line-height:1;letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums;display:inline-block}
+.hero-unit{font-size:12px;color:var(--ink3);margin-left:3px}
+.hero-line{margin:8px 0 0;font-size:15.5px;font-weight:750;line-height:1.45}
+.hero-sub{margin:4px 0 0;font-size:13px;color:var(--ink2);line-height:1.5}
+.hero-dates{display:flex;gap:18px;margin-top:13px;padding-top:12px;border-top:2px dashed var(--line)}
+.hero-dates .k{display:block;font-size:11.5px;color:var(--ink3);margin-bottom:2px}
+.hero-dates b{font-size:14px;font-variant-numeric:tabular-nums}
+
+.pill{
+  display:inline-block;padding:4px 13px;border-radius:100px;
+  font-size:12px;font-weight:750;letter-spacing:.02em;
+  background:var(--surface-soft);color:var(--ink2);
+  border:2px solid var(--line);
+}
+.pill.p-menstrual {background:color-mix(in srgb, var(--menstrual) 20%, var(--surface));
+  border-color:color-mix(in srgb, var(--menstrual) 45%, transparent);  color:var(--menstrual)}
+.pill.p-follicular{background:color-mix(in srgb, var(--follicular) 22%, var(--surface));
+  border-color:color-mix(in srgb, var(--follicular) 45%, transparent); color:var(--follicular)}
+.pill.p-ovulation {background:color-mix(in srgb, var(--ovulation) 24%, var(--surface));
+  border-color:color-mix(in srgb, var(--ovulation) 50%, transparent);  color:var(--ovulation)}
+.pill.p-luteal    {background:color-mix(in srgb, var(--luteal) 22%, var(--surface));
+  border-color:color-mix(in srgb, var(--luteal) 45%, transparent);     color:var(--luteal)}
+.pill.p-overdue   {background:color-mix(in srgb, var(--danger) 18%, var(--surface));
+  border-color:color-mix(in srgb, var(--danger) 42%, transparent);     color:var(--danger)}
+
+/* ── 按钮 ─────────────────────────────────────── */
+.quick{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.btn{
+  appearance:none;border-radius:100px;padding:12px 20px;font-size:14.5px;font-weight:750;
+  font-family:inherit;cursor:pointer;color:var(--ink);background:var(--surface);
+  border:2.5px solid var(--line);box-shadow:var(--shadow-sm);
+  transition:transform .1s ease, box-shadow .1s ease, background .18s;
+}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.btn-primary{
+  background:linear-gradient(180deg,#FF9CBC,var(--pink-deep));
+  color:var(--pink-ink);border-color:var(--pink-deep);
+  box-shadow:0 4px 0 #D2476F, 0 10px 20px rgba(255,127,168,.32);
+  flex:1;min-width:140px;
+}
+.btn-primary:active{box-shadow:0 1px 0 #D2476F, 0 4px 10px rgba(255,127,168,.3)}
+.btn-soft{background:var(--pink-soft);border-color:var(--pink-line);color:var(--pink-deep)}
+.btn-soft:active{box-shadow:0 1px 0 var(--pink-line)}
+.btn-danger{background:color-mix(in srgb, var(--danger) 14%, var(--surface));
+  border-color:color-mix(in srgb, var(--danger) 40%, transparent);color:var(--danger)}
+.btn-danger-ghost{background:transparent;color:var(--danger);border-color:var(--line);width:100%}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.btn-col{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.btn-col .btn{width:100%}
+
+.icon-btn{
+  appearance:none;border:2.5px solid var(--line);background:var(--surface);
+  width:40px;height:40px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+  box-shadow:var(--shadow-sm);color:var(--ink2);flex:0 0 auto;transition:transform .1s, box-shadow .1s;
+}
+.icon-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.icon-btn svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2.2;
+  stroke-linecap:round;stroke-linejoin:round}
+.cal-nav{display:flex;gap:8px}
+
+/* ── 选项胶囊 ─────────────────────────────────── */
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{
+  appearance:none;font-family:inherit;cursor:pointer;font-weight:600;
+  border:2.5px solid var(--line);background:var(--surface);color:var(--ink2);
+  border-radius:100px;padding:8px 15px;font-size:13.5px;line-height:1.25;
+  box-shadow:0 3px 0 var(--line);
+  transition:transform .1s, box-shadow .1s, background .16s, color .16s;
+}
+.chip:active{transform:translateY(3px);box-shadow:0 0 0 var(--line)}
+.chip[aria-pressed="true"]{
+  background:linear-gradient(180deg,#FF9CBC,var(--pink));border-color:var(--pink-deep);
+  color:var(--pink-ink);box-shadow:0 3px 0 var(--pink-deep);
+}
+.chips-flow .chip[aria-pressed="true"]{
+  background:linear-gradient(180deg,#FF8FAE,var(--menstrual));border-color:#E4537F;
+  box-shadow:0 3px 0 #E4537F;color:#fff;
+}
+
+textarea,input[type="text"]{
+  width:100%;font-family:inherit;font-size:14.5px;color:var(--ink);
+  background:var(--surface-soft);border:2.5px solid var(--line);border-radius:var(--radius-sm);
+  padding:11px 14px;resize:vertical;outline:none;transition:border-color .16s;
+}
+textarea:focus,input[type="text"]:focus{border-color:var(--pink-line)}
+textarea::placeholder,input::placeholder{color:var(--ink3)}
+
+/* ── 设置行 ───────────────────────────────────── */
+.row{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:13px 0;border-bottom:2px dashed var(--line);font-size:14.5px;
+}
+.row:last-of-type{border-bottom:0;padding-bottom:2px}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper b{min-width:58px;text-align:center;font-variant-numeric:tabular-nums;font-size:14px}
+.step{
+  appearance:none;border:2.5px solid var(--line);background:var(--surface-soft);
+  color:var(--ink2);width:32px;height:32px;border-radius:50%;font-size:17px;font-weight:700;
+  line-height:1;cursor:pointer;display:grid;place-items:center;padding:0;
+  box-shadow:0 3px 0 var(--line);transition:transform .1s, box-shadow .1s;
+}
+.step:active{transform:translateY(3px);box-shadow:0 0 0 var(--line)}
+
+.switch{
+  appearance:none;width:50px;height:29px;border-radius:100px;background:var(--surface-soft);
+  border:2.5px solid var(--line);position:relative;cursor:pointer;transition:background .2s, border-color .2s;
+  flex:0 0 auto;margin:0;
+}
+.switch::after{
+  content:"";position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;
+  background:#fff;box-shadow:0 2px 4px rgba(120,60,90,.25);transition:transform .22s cubic-bezier(.34,1.56,.64,1);
+}
+.switch:checked{background:linear-gradient(180deg,#FF9CBC,var(--pink));border-color:var(--pink-deep)}
+.switch:checked::after{transform:translateX(21px)}
+
+/* ── 贴纸设置 ─────────────────────────────────── */
+.sticker-row{display:flex;align-items:center;gap:16px;margin-top:16px}
+.sticker-preview{
+  width:84px;height:84px;flex:0 0 84px;object-fit:contain;
+  background:var(--surface-soft);border:2.5px solid var(--line);border-radius:20px;padding:6px;
+}
+.sticker-btns{display:flex;flex-direction:column;gap:10px;flex:1;min-width:0}
+.sticker-btns .btn{width:100%}
+
+/* ── 日历 ─────────────────────────────────────── */
+.cal-week,.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-week{margin-bottom:8px}
+.cal-week span{text-align:center;font-size:11.5px;color:var(--ink3);font-weight:750}
+
+.day{
+  appearance:none;border:2.5px solid transparent;background:transparent;font-family:inherit;font-weight:600;
+  aspect-ratio:1;border-radius:16px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;cursor:pointer;
+  color:var(--ink);font-size:14px;position:relative;padding:0;
+  transition:transform .1s, background .16s, border-color .16s;
+}
+.day.pad{visibility:hidden}
+.day-num{font-variant-numeric:tabular-nums;line-height:1;position:relative;z-index:1}
+.day.today{border-color:var(--pink);border-style:dashed}
+.day.today .day-num{font-weight:800;color:var(--pink-deep)}
+.day.has-log .day-num::after{
+  content:"";position:absolute;left:50%;transform:translateX(-50%);
+  bottom:-5px;width:5px;height:5px;border-radius:50%;background:var(--ink3);
+}
+.day.is-menstrual{background:color-mix(in srgb, var(--menstrual) 22%, var(--surface));
+  border-color:color-mix(in srgb, var(--menstrual) 40%, transparent)}
+.day.is-menstrual .day-num{color:var(--menstrual);font-weight:800}
+.day.is-predicted{background:color-mix(in srgb, var(--predicted) 42%, var(--surface));
+  border-color:color-mix(in srgb, var(--predicted) 60%, transparent);border-style:dashed}
+.day.is-fertile{background:color-mix(in srgb, var(--fertile) 20%, var(--surface));
+  border-color:color-mix(in srgb, var(--fertile) 38%, transparent)}
+.day.is-ovulation{background:color-mix(in srgb, var(--ovulation) 28%, var(--surface));
+  border-color:color-mix(in srgb, var(--ovulation) 48%, transparent)}
+.day.is-ovulation .day-num{color:#C97F00;font-weight:800}
+.day:active{transform:scale(.9)}
+
+.legend{display:flex;flex-wrap:wrap;gap:10px 14px;margin-top:16px;font-size:12.5px;color:var(--ink2)}
+.legend span{display:flex;align-items:center;gap:5px}
+.dot{width:11px;height:11px;border-radius:4px;display:block;border:1.5px solid rgba(0,0,0,.08)}
+.d-menstrual{background:var(--menstrual)}
+.d-predicted{background:var(--predicted)}
+.d-fertile{background:var(--fertile)}
+.d-ovulation{background:var(--ovulation)}
+.d-logged{background:var(--ink3);border-radius:50%;border:0;width:8px;height:8px}
+
+/* ── 历史 / 统计 ──────────────────────────────── */
+.history{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.hist-row{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:11px 0;border-bottom:2px dashed var(--line);font-size:14px;
+}
+.hist-row:last-child{border-bottom:0}
+.hist-row .grow{color:var(--ink2);font-size:13px;font-variant-numeric:tabular-nums}
+.hist-row b{font-variant-numeric:tabular-nums}
+.empty{color:var(--ink3);font-size:14px;padding:14px 0;text-align:center}
+
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:16px}
+.stat{
+  background:var(--surface);border:2.5px solid var(--line);border-radius:var(--radius);
+  padding:16px;box-shadow:var(--shadow);
+}
+.stat:nth-child(1){background:linear-gradient(160deg,var(--surface),color-mix(in srgb,var(--menstrual) 12%,var(--surface)))}
+.stat:nth-child(2){background:linear-gradient(160deg,var(--surface),color-mix(in srgb,var(--follicular) 14%,var(--surface)))}
+.stat:nth-child(3){background:linear-gradient(160deg,var(--surface),color-mix(in srgb,var(--luteal) 14%,var(--surface)))}
+.stat:nth-child(4){background:linear-gradient(160deg,var(--surface),color-mix(in srgb,var(--fertile) 14%,var(--surface)))}
+.stat .v{font-size:27px;font-weight:800;letter-spacing:-.02em;line-height:1.15;font-variant-numeric:tabular-nums}
+.stat .v small{font-size:13px;font-weight:600;color:var(--ink3);margin-left:3px;letter-spacing:0}
+.stat .k{font-size:13px;color:var(--ink2);margin-top:6px}
+
+.bars{display:flex;align-items:flex-end;gap:9px;height:138px;margin:18px 0 6px}
+.bars-empty{align-items:center;justify-content:center}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px}
+.bar{
+  width:100%;border-radius:10px 10px 6px 6px;min-height:6px;
+  background:linear-gradient(180deg, var(--follicular), color-mix(in srgb, var(--follicular) 65%, transparent));
+  border:2px solid color-mix(in srgb, var(--follicular) 55%, transparent);
+}
+.bar.is-short{background:linear-gradient(180deg,var(--ovulation),color-mix(in srgb,var(--ovulation) 65%,transparent));
+  border-color:color-mix(in srgb,var(--ovulation) 55%,transparent)}
+.bar.is-long {background:linear-gradient(180deg,var(--luteal),color-mix(in srgb,var(--luteal) 65%,transparent));
+  border-color:color-mix(in srgb,var(--luteal) 55%,transparent)}
+.bar-val{font-size:11.5px;color:var(--ink2);font-variant-numeric:tabular-nums;font-weight:750}
+.bar-lab{font-size:11px;color:var(--ink3);font-variant-numeric:tabular-nums}
+
+.phase-legend{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.pl-row{display:flex;align-items:center;gap:11px;font-size:14px}
+.pl-swatch{width:14px;height:14px;border-radius:5px;flex:0 0 auto;border:1.5px solid rgba(0,0,0,.08)}
+.pl-row .pl-days{margin-left:auto;color:var(--ink3);font-size:13px;font-variant-numeric:tabular-nums}
+
+/* ── 底部导航 ─────────────────────────────────── */
+.tabbar{
+  position:fixed;bottom:0;left:0;right:0;z-index:20;
+  display:flex;justify-content:center;gap:2px;
+  padding:9px 10px calc(9px + var(--safe-b));
+  background:color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter:saturate(180%) blur(18px);
+  -webkit-backdrop-filter:saturate(180%) blur(18px);
+  border-top:2.5px solid var(--line);
+}
+.tab{
+  appearance:none;border:0;background:transparent;font-family:inherit;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:700;
+  color:var(--ink3);font-size:11px;padding:7px 0;border-radius:18px;
+  width:76px;max-width:22vw;transition:color .16s, background .16s, transform .1s;
+}
+.tab svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tab.is-active{color:var(--pink-deep);background:var(--pink-soft)}
+.tab:active{transform:scale(.94)}
+
+/* ── 底部弹层 ─────────────────────────────────── */
+.sheet-mask{
+  position:fixed;inset:0;z-index:40;background:rgba(90,40,70,.34);
+  display:flex;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(2px);
+  animation:veil .18s ease;
+}
+@keyframes veil{from{opacity:0}to{opacity:1}}
+.sheet{
+  width:100%;max-width:520px;max-height:88dvh;overflow-y:auto;
+  background:var(--surface);border:2.5px solid var(--line);border-bottom:0;
+  border-radius:30px 30px 0 0;
+  padding:12px 20px calc(26px + var(--safe-b));
+  box-shadow:0 -6px 0 rgba(255,127,168,.12), 0 -14px 40px rgba(90,40,70,.2);
+  animation:slideUp .3s cubic-bezier(.34,1.4,.64,1);
+  -webkit-overflow-scrolling:touch;
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
+.sheet-grab{width:44px;height:5px;border-radius:100px;background:var(--pink-line);margin:2px auto 16px}
+
+/* ── 提示条 ───────────────────────────────────── */
+.toast{
+  position:fixed;left:50%;bottom:calc(100px + var(--safe-b));transform:translateX(-50%);
+  z-index:60;background:linear-gradient(180deg,#FF9CBC,var(--pink-deep));color:#fff;
+  border:2.5px solid var(--pink-deep);
+  padding:11px 22px;border-radius:100px;font-size:14px;font-weight:700;
+  max-width:88vw;text-align:center;box-shadow:0 5px 0 #D2476F, 0 12px 26px rgba(255,127,168,.3);
+  animation:toastIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(14px) scale(.9)}
+  to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
+
+/* ── 记录成功时蹦出来的小星星 ─────────────────── */
+.burst{position:fixed;inset:0;pointer-events:none;z-index:70;overflow:hidden}
+.burst i{position:absolute;font-size:20px;animation:burstUp .95s ease-out forwards;
+  font-style:normal;line-height:1}
+@keyframes burstUp{
+  0%{opacity:0;transform:translateY(0) scale(.4) rotate(0)}
+  25%{opacity:1}
+  100%{opacity:0;transform:translateY(-150px) scale(1.15) rotate(28deg)}
+}
+
+@media (min-width:560px){
+  .phone{border-left:2.5px solid var(--line);border-right:2.5px solid var(--line)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
