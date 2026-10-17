@@ -138,6 +138,28 @@ b{font-weight:700}
 .card-head h2::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;
   background:var(--pink);margin-right:8px;vertical-align:1px}
 
+/* ── 小提示：一句人话 + 做法 + 原理 ─────────────── */
+.tip-title{margin:2px 0 10px;font-size:15px;font-weight:750;line-height:1.55}
+.tip-points{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.tip-points li{position:relative;padding-left:18px;font-size:13.5px;line-height:1.62;color:var(--ink2)}
+.tip-points li::before{
+  content:"";position:absolute;left:2px;top:8px;width:6px;height:6px;border-radius:50%;
+  background:var(--pink-line);
+}
+.tip-why{
+  margin:12px 0 0;padding:10px 12px;border-radius:14px;
+  background:var(--surface-soft);border:1.5px solid var(--line);
+  font-size:12.5px;line-height:1.65;color:var(--ink2);
+}
+.tip-see{
+  margin:8px 0 0;padding:10px 12px;border-radius:14px;
+  background:color-mix(in srgb, var(--ovulation) 12%, var(--surface));
+  border:1.5px solid color-mix(in srgb, var(--ovulation) 34%, transparent);
+  font-size:12.5px;line-height:1.65;color:var(--ink2);
+}
+.tip-why b,.tip-see b{display:inline-block;margin-right:6px;font-weight:750;color:var(--ink)}
+.tip-see b{color:color-mix(in srgb, var(--ovulation) 82%, var(--ink))}
+
 /* ── 吉祥物 ───────────────────────────────────── */
 .mascot{width:104px;height:104px;flex:0 0 104px;animation:bob 3.4s ease-in-out infinite}
 @keyframes bob{
@@ -164,6 +186,10 @@ b{font-weight:700}
 @keyframes wobble{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
 
 /* ── 首页主卡 ─────────────────────────────────── */
+.banner{background:linear-gradient(160deg, var(--surface), var(--pink-soft));border-color:var(--pink-line)}
+.banner p{margin:0 0 12px;font-size:15px;font-weight:700;line-height:1.5}
+.banner .quick{margin-bottom:0}
+
 .hero{display:flex;align-items:center;gap:14px;padding:20px 16px;position:relative;
   background:linear-gradient(165deg, var(--surface) 55%, var(--pink-soft))}
 .hero-art{position:relative;flex:0 0 104px;width:104px}
@@ -205,6 +231,11 @@ b{font-weight:700}
 
 /* ── 按钮 ─────────────────────────────────────── */
 .quick{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.quick-note{
+  margin:-2px 0 16px;padding:10px 14px;border-radius:16px;
+  background:var(--surface-soft);border:2px solid var(--line);
+  color:var(--ink2);font-size:13.5px;line-height:1.5;
+}
 .btn{
   appearance:none;border-radius:100px;padding:12px 20px;font-size:14.5px;font-weight:750;
   font-family:inherit;cursor:pointer;color:var(--ink);background:var(--surface);
@@ -426,6 +457,11 @@ textarea::placeholder,input::placeholder{color:var(--ink3)}
 }
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
 .sheet-grab{width:44px;height:5px;border-radius:100px;background:var(--pink-line);margin:2px auto 16px}
+.sheet-state{
+  margin:0;font-size:13.5px;color:var(--ink2);line-height:1.5;
+  background:var(--surface-soft);border:2px solid var(--line);
+  border-radius:14px;padding:10px 13px;
+}
 
 /* ── 提示条 ───────────────────────────────────── */
 .toast{

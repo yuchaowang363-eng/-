@@ -150,8 +150,17 @@
 
     <section class="quick" id="quickActions">
       <button class="btn btn-primary" id="btnPeriodStart">经期来了</button>
-      <button class="btn btn-soft" id="btnPeriodToday">今天还在经期</button>
       <button class="btn btn-soft" id="btnPeriodEnd">经期结束了</button>
+    </section>
+
+    <p class="quick-note" id="quickNote" hidden></p>
+
+    <section class="card banner" id="periodBanner" hidden>
+      <p id="bannerText">结束了吗？</p>
+      <div class="quick">
+        <button class="btn btn-primary" id="btnBannerEnd">已经结束了</button>
+        <button class="btn btn-soft" id="btnBannerSnooze">还没结束</button>
+      </div>
     </section>
 
     <section class="card">
@@ -163,6 +172,9 @@
       <p class="label">流量</p>
       <div class="chips chips-flow" id="flowChips"></div>
 
+      <p class="label">痛经</p>
+      <div class="chips chips-flow" id="crampChips"></div>
+
       <p class="label">身体感受</p>
       <div class="chips" id="symptomChips"></div>
 
@@ -171,11 +183,14 @@
 
       <p class="label">想写点什么</p>
       <textarea id="noteInput" rows="2" placeholder="肚子有点闷、今天很困……"></textarea>
+
+      <p class="label">想补记前几天？</p>
+      <div class="chips" id="catchup"></div>
     </section>
 
     <section class="card tip" id="tipCard">
       <div class="card-head"><h2>小提示</h2></div>
-      <p id="tipText">记录得越多，预测越准。</p>
+      <div id="tipBody"></div>
     </section>
 
     <p class="disclaimer">预测基于你自己的历史记录估算，仅供参考，不能作为医疗建议或避孕依据。</p>
@@ -237,6 +252,12 @@
     <section class="card">
       <div class="card-head"><h2>各阶段都在什么时候</h2></div>
       <div class="phase-legend" id="phaseLegend"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>身体感受的规律</h2></div>
+      <div class="history" id="symptomPatterns"></div>
+      <p class="hint" id="patternHint"></p>
     </section>
   </main>
 
@@ -365,8 +386,13 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
       </button>
     </div>
+    <p class="label">经期</p>
+    <p class="sheet-state" id="sheetPeriodState">—</p>
+    <div class="chips" id="sheetPeriodBtns"></div>
     <p class="label">流量</p>
     <div class="chips chips-flow" id="sheetFlow"></div>
+    <p class="label">痛经</p>
+    <div class="chips chips-flow" id="sheetCramps"></div>
     <p class="label">身体感受</p>
     <div class="chips" id="sheetSymptoms"></div>
     <p class="label">心情</p>
