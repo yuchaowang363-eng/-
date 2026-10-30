@@ -13,3 +13,5 @@ Node.js 22+，运行 `npm start`，端口由 `PORT` 指定。Render 自动提供
 Netlify 项目的 Base directory 设为 `museum-relay`，使用本目录的 `netlify.toml`。无需构建命令；发布目录为 `public`，Edge Functions 从 `netlify/edge-functions` 自动打包。不要将原仓库根目录发布为本服务。
 
 此入口不使用 Render，也不需要环境变量或任何后台管理密钥。通过标准 Request/Response API 转发文字和照片，保留原有的 5 MB 照片上限；前端仍需在服务部署并确认手机可访问后，才把 `config.js` 的 `apiUrl` 切换为新地址的 `/api`。
+
+Netlify 项目：`yuchao-ruyi-museum-api`（ID `659e776f-bbc8-4823-9cb9-6e52a2185ef6`），连接检测地址为 `https://yuchao-ruyi-museum-api.netlify.app/health`。本目录使用 CLI 发布：`netlify deploy --prod --site 659e776f-bbc8-4823-9cb9-6e52a2185ef6`。新项目需要在 Netlify 设置中公开生产入口，接口自身仍强制校验原有邀请凭证。
