@@ -29,7 +29,8 @@ test('Netlify handler forwards authenticated records, full-size photo uploads, a
     assert.equal((await call('/api/state',{headers:{...headers,Origin:'https://unrelated.example'}})).status,403);
     let r=await call('/api/state',{headers});assert.equal(r.status,200);assert.equal(r.headers.get('Access-Control-Allow-Origin'),headers.Origin);assert.equal(lastHeaders.origin,undefined);
     const data=await r.json(),url=data.photoUrls[photo];assert.ok(url.startsWith(base+'/media/'));
-    r=await handler(new Request(url));assert.equal(r.status,200);assert.equal(r.headers.get('Cache-Control'),'private, max-age=900');assert.deepEqual(new Uint8Array(await r.arrayBuffer()),new Uint8Array([255,216,255,217]));assert.equal(lastHeaders['x-museum-key'],undefined);
+    r=await handler(new Request(url));assert.equal(r.status,200);assert.equal(r.headers.get('Cache-Control'),'private, max-age=900');assert.equal(r.headers.get('Vary'),'Origin');assert.deepEqual(new Uint8Array(await r.arrayBuffer()),new Uint8Array([255,216,255,217]));assert.equal(lastHeaders['x-museum-key'],undefined);
+    r=await handler(new Request(url,{headers:{Origin:headers.Origin}}));assert.equal(r.headers.get('Access-Control-Allow-Origin'),headers.Origin);assert.equal(r.headers.get('Vary'),'Origin');
     const denied=await handler(new Request(url.replace('token=','token=invalid')));assert.equal(denied.status,403);assert.equal(denied.headers.get('Cache-Control'),'private, no-store');
     const payload=new Uint8Array(5*1024*1024+300);
     r=await call('/api/photos',{method:'POST',headers:{...headers,'Content-Type':'multipart/form-data; boundary=test'},body:payload});assert.equal(r.status,200);assert.equal(bodyBytes,payload.byteLength);assert.equal(writes,1);assert.equal(lastHeaders['content-type'],'multipart/form-data; boundary=test');

@@ -21,3 +21,5 @@
 @media(max-height:560px){#memory-dialog .dialog-head{padding-top:9px;padding-bottom:9px}#memory-dialog .field{margin:11px 0}#memory-form .form-actions{padding-top:9px;padding-bottom:9px}}
 
 @media(max-width:680px){#memory-dialog[open]{top:calc(var(--dialog-top,0px) + 12px);bottom:auto;left:0;right:0;margin:0 auto}}
+
+.dialog-head h2{min-width:0;overflow-wrap:anywhere}.dialog-head .close{flex-shrink:0}.detail-body,.detail-place,.anniversary-card h3,#image-title{overflow-wrap:anywhere;min-width:0}

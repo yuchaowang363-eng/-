@@ -11,7 +11,7 @@ export function createHandler({upstream=UPSTREAM,pageOrigin=PAGE_ORIGIN}={}){
   const storageOrigin=new URL(upstream).origin;
   return async function handler(request){
     const url=new URL(request.url),origin=request.headers.get('Origin');
-    const cors=new Headers({'Access-Control-Allow-Headers':'content-type,x-museum-id,x-museum-key,x-museum-revision','Access-Control-Allow-Methods':'GET,POST,PUT,PATCH,DELETE,OPTIONS','Access-Control-Max-Age':'3600','Cache-Control':'private, no-store'});
+    const cors=new Headers({'Access-Control-Allow-Headers':'content-type,x-museum-id,x-museum-key,x-museum-revision','Access-Control-Allow-Methods':'GET,POST,PUT,PATCH,DELETE,OPTIONS','Access-Control-Max-Age':'3600','Cache-Control':'private, no-store','Vary':'Origin'});
     if(origin===pageOrigin||origin===url.origin){cors.set('Access-Control-Allow-Origin',origin);cors.set('Vary','Origin')}
     const json=(status,value)=>new Response(JSON.stringify(value),{status,headers:new Headers([...cors,['Content-Type','application/json; charset=utf-8']])});
     if(origin&&origin!==pageOrigin&&origin!==url.origin)return json(403,{error:'请从博物馆网页访问。'});

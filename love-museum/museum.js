@@ -9,6 +9,7 @@ let loaded=false,saving=false,view='home',filter='all',query='',lastCalendarDay=
 let editingId=null,detailId=null,eventId=null,deleteEventId=null;
 let pendingPhotos=[],coverIndex=0,pendingCover=null,backup=null,lightbox=[],lightboxIndex=0;
 let draft=null,processingPhotos=false;
+let memoryDraft=0,coverDraft=0;
 let stateVersion=0;
 const uploadedPreviews=new Map();
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -108,7 +109,7 @@ function eventCard(item,compact=false){
 function renderEvents(){const events=eventItems(),grid=$('#events-list');grid.replaceChildren();events.forEach(e=>grid.append(eventCard(e)));$('#events-empty').classList.toggle('hidden',events.length>0);const upcoming=events.filter(e=>e.remaining>=0).slice(0,3);$('#upcoming').classList.toggle('hidden',view!=='home'||!upcoming.length);$('#upcoming-list').replaceChildren();upcoming.forEach(e=>$('#upcoming-list').append(eventCard(e,true)))}
 function resetPhotos(){for(const p of pendingPhotos)releasePreview(p.localUrl);pendingPhotos=[]}
 function openMemory(category='日常',item=null){
-  if(!showDialog('#memory-dialog'))return;resetPhotos();editingId=item?.id||crypto.randomUUID();const f=$('#memory-form');f.reset();
+  if(!showDialog('#memory-dialog'))return;memoryDraft++;processingPhotos=false;$('#memory-form [type=submit]').disabled=false;resetPhotos();editingId=item?.id||crypto.randomUUID();const f=$('#memory-form');f.reset();
   f.elements.title.value=item?.title||'';f.elements.date.value=item?.date||today();f.elements.date.max=today();f.elements.category.value=item?.category||category;f.elements.story.value=item?.story||'';f.elements.place.value=item?.place||'';
   pendingPhotos=(item?.photos||[]).map(id=>({id}));$('#memory-dialog-title').textContent=item?'把这段回忆写得更完整':category==='书信'?'有些话，只想说给你听。':'收藏一段我们的故事';$('#memory-error').textContent='';$('#memory-progress').textContent='';$('#memory-dialog .memory-fields').scrollTop=0;renderPending();
 }
@@ -126,7 +127,7 @@ async function uploadPhotos(photos){const ids=new Array(photos.length);let next=
 function openDate(){if(!loaded)return;$('#settings-dialog').close();if(!showDialog('#date-dialog'))return;const f=$('#date-form');f.elements.start.value=state.start;f.elements.start.max=today();$('#date-error').textContent=''}
 function openDetail(id){const item=state.memories.find(m=>m.id===id);if(!item)return;detailId=id;$('#detail-title').textContent=item.title;$('#detail-date').textContent=`${dateText(item.date)} / ${item.category}`;$('#detail-story').textContent=item.story;$('#detail-place').textContent=item.place?'地点：'+item.place:'';$('#delete-confirm').classList.add('hidden');$('#delete-memory').textContent='删除这段记录';$('#detail-error').textContent='';const grid=$('#detail-photos');grid.replaceChildren();const photos=item.photos.map(id=>({id,title:item.title,date:item.date}));photos.forEach((photo,i)=>{const button=node('button'),img=node('img');setPhoto(img,photo.id);img.alt=item.title;button.append(img);button.onclick=()=>openLightbox(photos,i);grid.append(button)});showDialog('#detail-dialog')}
 function openEvent(id=null){if(!showDialog('#event-dialog'))return;const item=state.anniversaries.find(e=>e.id===id);eventId=item?.id||crypto.randomUUID();const f=$('#event-form');f.reset();f.elements.title.value=item?.title||'';f.elements.date.value=item?.date||today();f.elements.annual.checked=item?.annual??true;$('#event-error').textContent='';$('#event-dialog-title').textContent=item?'把这个日子记得更准确':'收藏一个特别的日子'}
-function openCover(index){if(!showDialog('#cover-dialog'))return;coverIndex=index;releasePreview(pendingCover?.localUrl);pendingCover=state.covers[index]?{id:state.covers[index]}:null;$('#cover-error').textContent='';renderCover()}
+function openCover(index){if(!showDialog('#cover-dialog'))return;coverDraft++;coverIndex=index;$('#save-cover').disabled=false;releasePreview(pendingCover?.localUrl);pendingCover=state.covers[index]?{id:state.covers[index]}:null;$('#cover-error').textContent='';renderCover()}
 function renderCover(){const grid=$('#cover-preview');grid.replaceChildren();if(pendingCover){const img=node('img');if(pendingCover.id)setPhoto(img,pendingCover.id);else img.src=pendingCover.localUrl;img.alt='首页照片预览';grid.append(img)}else grid.append(node('p','muted','这里还没有照片，选一张你们喜欢的合照吧。'));$('#remove-cover').disabled=!pendingCover}
 function openLightbox(photos,index){lightbox=photos;lightboxIndex=index;renderLightbox();showDialog('#image-dialog')}
 function renderLightbox(){const p=lightbox[lightboxIndex];setPhoto($('#lightbox-image'),p.id);$('#lightbox-image').alt=p.title;$('#image-title').textContent=p.title;$('#image-number').textContent=`${lightboxIndex+1} / ${lightbox.length}`;$('#previous-photo').disabled=lightboxIndex===0;$('#next-photo').disabled=lightboxIndex===lightbox.length-1}
@@ -158,9 +159,9 @@ async function importBackup(){
 async function exportBackup(){
   const button=$('#export');if(button.disabled)return;button.disabled=true;$('#settings-error').textContent='';
   try{const current=await api('state');const ids=[...new Set([...current.covers,...current.memories.flatMap(m=>m.photos)].filter(Boolean))],assets={};
-    for(let i=0;i<ids.length;i++){button.textContent=`正在打包照片 ${i+1}/${ids.length}…`;const r=await fetch(photoUrl(ids[i]));if(!r.ok)throw new Error('有照片暂时无法读取，完整备份尚未生成，请稍后重试。');const blob=await r.blob();assets[ids[i]]=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('照片读取失败。'));reader.readAsDataURL(blob)})}
+    for(let i=0;i<ids.length;i++){button.textContent=`正在打包照片 ${i+1}/${ids.length}…`;const source=current.photoUrls?.[ids[i]];if(!source)throw new Error('有照片暂时无法读取，完整备份尚未生成，请稍后重试。');const r=await fetch(source,{cache:'no-store'});if(!r.ok)throw new Error('有照片暂时无法读取，完整备份尚未生成，请稍后重试。');const blob=await r.blob();if(!['image/jpeg','image/png','image/webp'].includes(blob.type))throw new Error('有照片暂时没有正确返回，完整备份尚未生成，请稍后重试。');assets[ids[i]]=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('照片读取失败。'));reader.readAsDataURL(blob)})}
     const blob=new Blob([JSON.stringify({version:1,couple:['王宇超','卓如怡'],exportedAt:new Date().toISOString(),...current,assets,inviteUrl:window.museumStorage.inviteUrl()},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=node('a');a.href=url;a.download=`王宇超与卓如怡的恋爱博物馆-${today()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);toast('照片与故事，已经完整打包。');
-  }catch(error){$('#settings-error').textContent=error.message}finally{button.disabled=false;button.textContent='导出完整备份'}
+  }catch(error){const message=error instanceof TypeError?'暂时无法读取完整备份，请检查网络后重试。':error.message;$('#settings-error').textContent=message;toast(message)}finally{button.disabled=false;button.textContent='导出完整备份'}
 }
 document.addEventListener('click',e=>{
   const viewLink=e.target.closest('[data-view]');if(viewLink){e.preventDefault();const next=viewLink.dataset.view;if(location.hash==='#'+next)setView(next);else location.hash=next;return}
@@ -177,7 +178,13 @@ window.addEventListener('hashchange',()=>setView(location.hash.slice(1)));
 $('#search').addEventListener('input',e=>{query=e.target.value;renderCollection()});
 $$('dialog').forEach(d=>{d.addEventListener('cancel',e=>{if(saving)e.preventDefault()});d.addEventListener('click',e=>{if(e.target===d&&!saving){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close()}})});
 $('#pick-photos').onclick=()=>$('#photo-input').click();
-$('#photo-input').onchange=async e=>{const files=[...e.target.files];e.target.value='';if(files.length+pendingPhotos.length>6){$('#memory-error').textContent='每段回忆最多收藏 6 张照片，请少选几张。';return}processingPhotos=true;renderPending();const submit=$('#memory-form [type=submit]');submit.disabled=true;$('#memory-progress').textContent='正在整理照片…';$('#memory-error').textContent='';try{for(const file of files){const blob=await compress(file);pendingPhotos.push({blob,localUrl:URL.createObjectURL(blob)})}$('#memory-error').textContent=''}catch(error){$('#memory-error').textContent=error.message}finally{processingPhotos=false;submit.disabled=false;$('#memory-progress').textContent='';renderPending()}};
+$('#photo-input').onchange=async e=>{
+  const files=[...e.target.files],version=memoryDraft;e.target.value='';if(files.length+pendingPhotos.length>6){$('#memory-error').textContent='每段回忆最多收藏 6 张照片，请少选几张。';return}
+  processingPhotos=true;renderPending();const submit=$('#memory-form [type=submit]');submit.disabled=true;$('#memory-progress').textContent='正在整理照片…';$('#memory-error').textContent='';
+  try{for(const file of files){const blob=await compress(file);if(version!==memoryDraft||!$('#memory-dialog').open)return;pendingPhotos.push({blob,localUrl:URL.createObjectURL(blob)})}$('#memory-error').textContent=''}
+  catch(error){if(version===memoryDraft&&$('#memory-dialog').open)$('#memory-error').textContent=error.message}
+  finally{if(version===memoryDraft&&$('#memory-dialog').open){processingPhotos=false;submit.disabled=false;$('#memory-progress').textContent='';renderPending()}}
+};
 $('#memory-form').onsubmit=async e=>{e.preventDefault();if(processingPhotos)return;const f=e.currentTarget,title=f.elements.title.value.trim(),story=f.elements.story.value.trim(),date=f.elements.date.value;if(!story&&!pendingPhotos.length){$('#memory-error').textContent='写一点故事，或者放一张照片，就能好好收藏。';return}if(date>today()){$('#memory-error').textContent='回忆日期不能晚于今天。';return}const item={id:editingId,title,story,date,category:f.elements.category.value,place:f.elements.place.value.trim(),photos:[]};await saveAction($('#memory-dialog'),f.querySelector('[type=submit]'),'#memory-error',async()=>{item.photos=await uploadPhotos(pendingPhotos);await send('memories/'+item.id,item,'PUT');return ()=>{state={...state,memories:[...state.memories.filter(m=>m.id!==item.id),{...item,updatedAt:new Date().toISOString()}]}}},'这段回忆，已经好好收藏。')};
 $('#date-form').onsubmit=async e=>{e.preventDefault();const f=e.currentTarget,start=f.elements.start.value;if(start>today()){$('#date-error').textContent='相恋日不能晚于今天。';return}await saveAction($('#date-dialog'),f.querySelector('[type=submit]'),'#date-error',async()=>{await send('settings',{start},'PATCH');return ()=>{state={...state,start}}},'从这一天起，每一天都算数。')};
 $('#edit-memory').onclick=()=>{const item=state.memories.find(m=>m.id===detailId);$('#detail-dialog').close();openMemory(item.category,item)};
@@ -185,7 +192,12 @@ $('#delete-memory').onclick=async()=>{if($('#delete-confirm').classList.contains
 $('#event-form').onsubmit=async e=>{e.preventDefault();const f=e.currentTarget;const item={id:eventId,title:f.elements.title.value.trim(),date:f.elements.date.value,annual:f.elements.annual.checked};await saveAction($('#event-dialog'),f.querySelector('[type=submit]'),'#event-error',async()=>{await send('anniversaries/'+item.id,item,'PUT');return ()=>{state={...state,anniversaries:[...state.anniversaries.filter(a=>a.id!==item.id),item]}}},'这个日子，已经记在心上。')};
 $('#confirm-delete').onclick=()=>{const id=deleteEventId;return saveAction($('#confirm-dialog'),$('#confirm-delete'),'#confirm-error',async()=>{await api('anniversaries/'+id,{method:'DELETE'});return ()=>{state={...state,anniversaries:state.anniversaries.filter(a=>a.id!==id)}}},'纪念日已移除。')};
 $('#pick-cover').onclick=()=>$('#cover-input').click();
-$('#cover-input').onchange=async e=>{const file=e.target.files[0];e.target.value='';if(!file)return;$('#save-cover').disabled=true;$('#cover-error').textContent='正在整理照片…';try{const blob=await compress(file);releasePreview(pendingCover?.localUrl);pendingCover={blob,localUrl:URL.createObjectURL(blob)};renderCover();$('#cover-error').textContent=''}catch(error){$('#cover-error').textContent=error.message}finally{$('#save-cover').disabled=false}};
+$('#cover-input').onchange=async e=>{
+  const file=e.target.files[0],version=coverDraft;e.target.value='';if(!file)return;$('#save-cover').disabled=true;$('#cover-error').textContent='正在整理照片…';
+  try{const blob=await compress(file);if(version!==coverDraft||!$('#cover-dialog').open)return;releasePreview(pendingCover?.localUrl);pendingCover={blob,localUrl:URL.createObjectURL(blob)};renderCover();$('#cover-error').textContent=''}
+  catch(error){if(version===coverDraft&&$('#cover-dialog').open)$('#cover-error').textContent=error.message}
+  finally{if(version===coverDraft&&$('#cover-dialog').open)$('#save-cover').disabled=false}
+};
 $('#remove-cover').onclick=()=>{releasePreview(pendingCover?.localUrl);pendingCover=null;renderCover()};
 $('#save-cover').onclick=()=>saveAction($('#cover-dialog'),$('#save-cover'),'#cover-error',async()=>{const covers=[state.covers[0]||null,state.covers[1]||null];covers[coverIndex]=pendingCover?await upload(pendingCover):null;await send('settings',{covers},'PATCH');return ()=>{state={...state,covers}}},'首页的合照，已经放好。');
 $('#previous-photo').onclick=()=>{if(lightboxIndex>0){lightboxIndex--;renderLightbox()}};$('#next-photo').onclick=()=>{if(lightboxIndex<lightbox.length-1){lightboxIndex++;renderLightbox()}};
