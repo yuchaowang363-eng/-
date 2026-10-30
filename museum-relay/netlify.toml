@@ -1,0 +1,14 @@
+[build]
+  publish = "public"
+
+[[edge_functions]]
+  function = "museum"
+  path = "/api/*"
+
+[[edge_functions]]
+  function = "museum"
+  path = "/media/*"
+
+[[edge_functions]]
+  function = "museum"
+  path = "/health"
