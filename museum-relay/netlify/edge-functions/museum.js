@@ -29,6 +29,9 @@ export function createHandler({upstream=UPSTREAM,pageOrigin=PAGE_ORIGIN}={}){
         const type=response.headers.get('Content-Type')?.split(';')[0];
         if(!['image/jpeg','image/png','image/webp'].includes(type))throw new Error('Unexpected photo type');
         const headers=new Headers(cors);headers.set('Content-Type',type);headers.set('X-Content-Type-Options','nosniff');
+        // Cache only in this visitor's browser and never beyond the signed URL's expiry.
+        let maxAge=0;try{const part=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');const payload=JSON.parse(atob(part));maxAge=Math.max(0,Math.min(900,Math.floor(Number(payload.exp)-Date.now()/1000-30)))||0}catch{}
+        headers.set('Cache-Control',`private, max-age=${maxAge}`);
         return new Response(response.body,{headers});
       }
       if(!API_PATH.test(url.pathname)||!['GET','POST','PUT','PATCH','DELETE'].includes(request.method))return json(404,{error:'没有找到这个页面。'});
